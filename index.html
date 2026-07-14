@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kolam Ikan IoT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted: #94a3b8;
+      --accent: #22c1c3;
+      --accent-2: #60a5fa;
+      --card-radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Segoe UI,Arial;
+      background:linear-gradient(180deg,#071021 0%, #071930 60%);
+      color:#e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    .wrap{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    h1{font-size:18px;margin:0;font-weight:700}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .card{background:var(--card);padding:18px;border-radius:var(--card-radius);box-shadow:0 6px 24px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .card h2{margin:0 0 8px 0;font-size:14px;color:#dffaff}
+    .value{font-size:28px;font-weight:700;color:var(--accent-2)}
+    .meta{font-size:12px;color:var(--muted);margin-top:6px}
+
+    .controls{display:flex;flex-wrap:wrap;gap:8px}
+    button{appearance:none;border:0;padding:10px 14px;border-radius:10px;font-weight:600;color:white;cursor:pointer;min-width:96px}
+    .auto{background:linear-gradient(90deg,#16a34a,#4ade80)}
+    .manual{background:linear-gradient(90deg,#dc2626,#fb7185)}
+    .on{background:linear-gradient(90deg,#0ea5a4,#60a5fa)}
+    .off{background:linear-gradient(90deg,#475569,#64748b)}
+    .feed{background:linear-gradient(90deg,#f59e0b,#fb923c)}
+
+    .history-section{display:grid;gap:14px}
+    .chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:12px}
+    .chart-card{background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:12px}
+    .chart-card h3{margin:0 0 8px 0;font-size:13px;color:#dffaff}
+    .chart-card .chart-box{position:relative;height:220px}
+
+    table{
+    margin-top:20px;
+}
+
+th,td{
+
+    border:1px solid rgba(255,255,255,.1);
+
+    padding:8px;
+
+    text-align:center;
+
+    font-size:13px;
+
+}
+
+th{
+
+    background:#172554;
+
+}
+
+tbody tr:nth-child(even){
+
+    background:#111827;
+
+}
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+
+    @media (max-width:520px){
+      .logo{width:48px;height:48px}
+      .value{font-size:22px}
+      header{gap:10px}
+      .chart-grid{grid-template-columns:1fr}
+      .chart-card .chart-box{height:180px}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">🐟</div>
+      <div>
+        <h1>SMART FISH POND IoT</h1>
+        <p class="lead">Dashboard monitoring kolam — data real-time dari Firebase</p>
+      </div>
+    </header>
+
+    <main class="grid">
+      <div class="card">
+        <h2>pH</h2>
+        <div class="value" id="ph">0</div>
+        <div class="meta" id="statusPH"></div>
+      </div>
+
+      <div class="card">
+        <h2>Turbidity</h2>
+        <div class="value" id="turbidity">0</div>
+        <div class="meta" id="statusTurb"></div>
+      </div>
+
+      <div class="card">
+        <h2>Level Air</h2>
+        <div class="value" id="air">0 %</div>
+      </div>
+
+      <div class="card">
+        <h2>Stok Pakan</h2>
+        <div class="value" id="pakan">0 %</div>
+      </div>
+
+      <div class="card">
+        <h2>Mode</h2>
+        <div class="controls">
+          <button class="auto" onclick="setMode(1)">AUTO</button>
+          <button class="manual" onclick="setMode(0)">MANUAL</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Pompa Kuras</h2>
+        <div class="controls">
+          <button class="on" onclick="setKuras(1)">ON</button>
+          <button class="off" onclick="setKuras(0)">OFF</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Pompa Isi</h2>
+        <div class="controls">
+          <button class="on" onclick="setIsi(1)">ON</button>
+          <button class="off" onclick="setIsi(0)">OFF</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Pakan</h2>
+        <div class="controls">
+          <button class="feed" onclick="feedFish()">BERI PAKAN</button>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1;">
+
+    <h2>History Monitoring</h2>
+    <p class="meta" style="margin:0 0 10px 0;">Grafik historis dipisah menjadi empat visual berbeda untuk memudahkan analisis.</p>
+
+    <div class="history-section">
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Grafik pH</h3>
+          <div class="chart-box"><canvas id="chartPh"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Grafik Turbidity</h3>
+          <div class="chart-box"><canvas id="chartTurbidity"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Grafik Level Air</h3>
+          <div class="chart-box"><canvas id="chartAir"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Grafik Stok Pakan</h3>
+          <div class="chart-box"><canvas id="chartPakan"></canvas></div>
+        </div>
+      </div>
+
+      <table
+        id="historyTable"
+        style="
+        width:100%;
+        border-collapse:collapse;
+        color:white;
+        ">
+
+        <thead>
+
+            <tr>
+
+                <th>Waktu</th>
+
+                <th>pH</th>
+
+                <th>Turbidity</th>
+
+                <th>Level Air (%)</th>
+
+                <th>Stok Pakan (%)</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        </tbody>
+
+    </table>
+
+</div>
+    </main>
+
+    <footer>Terhubung ke Firebase Realtime Database</footer>
+  </div>
+
+  <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDzcCb4zAkzvz2CawdbHRbrksDH9bu1g2Q",
+  databaseURL: "https://kolam-ikan-iot-78dc2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  authDomain: "kolam-ikan-iot-78dc2.firebaseapp.com",
+  projectId: "kolam-ikan-iot-78dc2",
+  storageBucket: "kolam-ikan-iot-78dc2.firebasestorage.app",
+  messagingSenderId: "943109178162",
+  appId: "1:943109178162:web:a8e8753287151c89c14d2b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+//==============================
+// CHART
+//==============================
+
+const chartConfigs = [
+  { id: "chartPh", label: "pH", color: "#00ff99" },
+  { id: "chartTurbidity", label: "Turbidity", color: "#00bfff" },
+  { id: "chartAir", label: "Level Air", color: "#ffd700" },
+  { id: "chartPakan", label: "Stok Pakan", color: "#ff6347" }
+];
+
+const charts = {};
+
+chartConfigs.forEach((config) => {
+  const canvas = document.getElementById(config.id);
+  const ctx = canvas.getContext("2d");
+
+  charts[config.id] = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [{
+        label: config.label,
+        data: [],
+        borderColor: config.color,
+        backgroundColor: "transparent",
+        borderWidth: 2,
+        tension: 0.3,
+        pointRadius: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          ticks: { color: "white" },
+          grid: { color: "rgba(255,255,255,0.08)" }
+        },
+        y: {
+          ticks: { color: "white" },
+          grid: { color: "rgba(255,255,255,0.08)" }
+        }
+      }
+    }
+  });
+});
+
+/*
+let historyChart =
+new Chart(ctx,{
+
+type:"line",
+
+data:{
+
+labels:[],
+
+datasets:[
+
+{
+
+label:"pH",
+
+data:[],
+
+borderWidth:2,
+
+tension:.3
+
+},
+
+{
+
+label:"Turbidity",
+
+data:[],
+
+borderWidth:2,
+
+tension:.3
+
+},
+
+{
+
+label:"Level Air",
+
+data:[],
+
+borderWidth:2,
+
+tension:.3
+
+},
+
+{
+
+label:"Stok Pakan",
+
+data:[],
+
+borderWidth:2,
+
+tension:.3
+
+}
+
+]
+
+},
+
+options:{
+
+responsive:true,
+
+plugins:{
+
+legend:{
+
+labels:{
+
+color:"white"
+
+}
+
+}
+
+},
+
+scales:{
+
+x:{
+
+ticks:{
+
+color:"white"
+
+}
+
+},
+
+y:{
+
+ticks:{
+
+color:"white"
+
+}
+
+}
+
+}
+
+}
+
+});
+*/
+
+onValue(ref(db, "sensor/ph"), (snapshot) => {
+  document.getElementById("ph").innerHTML = snapshot.val();
+});
+
+onValue(ref(db, "sensor/status_ph"), (snapshot) => {
+  document.getElementById("statusPH").innerHTML = snapshot.val();
+});
+
+onValue(ref(db, "sensor/turbidity"), (snapshot) => {
+  document.getElementById("turbidity").innerHTML = snapshot.val();
+});
+
+onValue(ref(db, "sensor/status_turbidity"), (snapshot) => {
+  document.getElementById("statusTurb").innerHTML = snapshot.val();
+});
+
+onValue(ref(db, "sensor/level_air"), (snapshot) => {
+  document.getElementById("air").innerHTML = snapshot.val() + " %";
+});
+
+onValue(ref(db, "sensor/stok_pakan"), (snapshot) => {
+  document.getElementById("pakan").innerHTML = snapshot.val() + " %";
+});
+
+window.setMode = function(mode) {
+  set(ref(db, "control/auto_mode"), mode);
+}
+
+window.setKuras = function(mode) {
+  set(ref(db, "relay/kuras"), mode);
+}
+
+window.setIsi = function(mode) {
+  set(ref(db, "relay/isi"), mode);
+}
+
+window.feedFish = function() {
+  set(ref(db, "servo/feed"), 1);
+  setTimeout(() => {
+    set(ref(db, "servo/feed"), 0);
+  }, 1000);
+}
+
+//==============================
+// HISTORY
+//==============================
+
+onValue(ref(db, "history"), (snapshot) => {
+
+    const data = snapshot.val();
+
+    if (!data) return;
+
+    const labels = [];
+    const ph = [];
+    const turb = [];
+    const air = [];
+    const pakan = [];
+
+    const tbody = document.querySelector("#historyTable tbody");
+    tbody.innerHTML = "";
+
+    // Ambil hanya 24 data terakhir
+    const keys = Object.keys(data).sort().slice(-24);
+
+    keys.forEach((key) => {
+
+        const item = data[key];
+
+        // Format waktu
+        let waktu = key;
+
+        // Jika key berupa timestamp millis()
+        if (!isNaN(key)) {
+            const d = new Date(Number(key));
+            waktu = d.toLocaleString("id-ID");
+        }
+
+        labels.push(waktu);
+
+        ph.push(item.ph);
+        turb.push(item.turbidity);
+        air.push(item.level_air);
+        pakan.push(item.stok_pakan);
+
+        tbody.innerHTML += `
+        <tr>
+            <td>${waktu}</td>
+            <td>${Number(item.ph).toFixed(2)}</td>
+            <td>${Number(item.turbidity).toFixed(0)}</td>
+            <td>${Number(item.level_air).toFixed(0)} %</td>
+            <td>${Number(item.stok_pakan).toFixed(0)} %</td>
+        </tr>
+        `;
+
+    });
+
+    Object.entries({
+      chartPh: ph,
+      chartTurbidity: turb,
+      chartAir: air,
+      chartPakan: pakan
+    }).forEach(([chartId, values]) => {
+      charts[chartId].data.labels = labels;
+      charts[chartId].data.datasets[0].data = values;
+      charts[chartId].update();
+    });
+
+});
+
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>
