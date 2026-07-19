@@ -29,6 +29,11 @@ const chartConfigs = [
 
 const charts = {};
 
+function formatNumber(value, digits = 2) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num.toFixed(digits) : value;
+}
+
 // Initialize charts
 chartConfigs.forEach((config) => {
   const canvas = document.getElementById(config.id);
@@ -63,7 +68,10 @@ chartConfigs.forEach((config) => {
           grid: { color: "rgba(255,255,255,0.08)" }
         },
         y: {
-          ticks: { color: "white" },
+          ticks: {
+            color: "white",
+            callback: (value) => Number(value).toFixed(2)
+          },
           grid: { color: "rgba(255,255,255,0.08)" }
         }
       }
@@ -77,7 +85,7 @@ chartConfigs.forEach((config) => {
 
 // pH Sensor
 onValue(ref(db, "sensor/ph"), (snapshot) => {
-  document.getElementById("ph").textContent = snapshot.val();
+  document.getElementById("ph").textContent = formatNumber(snapshot.val());
 });
 
 onValue(ref(db, "sensor/status_ph"), (snapshot) => {
@@ -86,7 +94,7 @@ onValue(ref(db, "sensor/status_ph"), (snapshot) => {
 
 // Turbidity Sensor
 onValue(ref(db, "sensor/turbidity"), (snapshot) => {
-  document.getElementById("turbidity").textContent = snapshot.val();
+  document.getElementById("turbidity").textContent = formatNumber(snapshot.val());
 });
 
 onValue(ref(db, "sensor/status_turbidity"), (snapshot) => {
@@ -95,12 +103,12 @@ onValue(ref(db, "sensor/status_turbidity"), (snapshot) => {
 
 // Water Level
 onValue(ref(db, "sensor/level_air"), (snapshot) => {
-  document.getElementById("air").textContent = snapshot.val() + " %";
+  document.getElementById("air").textContent = formatNumber(snapshot.val()) + " %";
 });
 
 // Feed Stock
 onValue(ref(db, "sensor/stok_pakan"), (snapshot) => {
-  document.getElementById("pakan").textContent = snapshot.val() + " %";
+  document.getElementById("pakan").textContent = formatNumber(snapshot.val()) + " %";
 });
 
 /* ================================
@@ -265,10 +273,10 @@ onValue(ref(db, "history"), (snapshot) => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${waktu}</td>
-      <td>${Number(item.ph).toFixed(2)}</td>
-      <td>${Number(item.turbidity).toFixed(0)}</td>
-      <td>${Number(item.level_air).toFixed(0)} %</td>
-      <td>${Number(item.stok_pakan).toFixed(0)} %</td>
+      <td>${formatNumber(item.ph)}</td>
+      <td>${formatNumber(item.turbidity)}</td>
+      <td>${formatNumber(item.level_air)} %</td>
+      <td>${formatNumber(item.stok_pakan)} %</td>
     `;
     tbody.appendChild(row);
   });
