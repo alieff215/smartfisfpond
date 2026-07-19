@@ -24,67 +24,122 @@
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
     }
-    .wrap{max-width:1100px;margin:28px auto;padding:20px}
-    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .wrap{max-width:1200px;margin:28px auto;padding:16px}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 6px 18px rgba(2,6,23,0.6);flex-shrink:0}
     h1{font-size:18px;margin:0;font-weight:700}
     p.lead{margin:0;color:var(--muted);font-size:13px}
 
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-    .card{background:var(--card);padding:18px;border-radius:var(--card-radius);box-shadow:0 6px 24px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;grid-auto-rows:max-content}
+    .card{background:var(--card);padding:18px;border-radius:var(--card-radius);box-shadow:0 6px 24px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03);transition:all 0.3s ease}
+    .card:hover{border-color:rgba(255,255,255,0.08);box-shadow:0 8px 32px rgba(2,6,23,0.8)}
     .card h2{margin:0 0 8px 0;font-size:14px;color:#dffaff}
-    .value{font-size:28px;font-weight:700;color:var(--accent-2)}
+    .value{font-size:28px;font-weight:700;color:var(--accent-2);word-break:break-word}
     .meta{font-size:12px;color:var(--muted);margin-top:6px}
 
     .controls{display:flex;flex-wrap:wrap;gap:8px}
-    button{appearance:none;border:0;padding:10px 14px;border-radius:10px;font-weight:600;color:white;cursor:pointer;min-width:96px}
-    .auto{background:linear-gradient(90deg,#16a34a,#4ade80)}
-    .manual{background:linear-gradient(90deg,#dc2626,#fb7185)}
-    .on{background:linear-gradient(90deg,#0ea5a4,#60a5fa)}
-    .off{background:linear-gradient(90deg,#475569,#64748b)}
-    .feed{background:linear-gradient(90deg,#f59e0b,#fb923c)}
+    button{appearance:none;border:0;padding:10px 14px;border-radius:10px;font-weight:600;color:white;cursor:pointer;min-width:96px;transition:all 0.2s ease;position:relative;overflow:hidden;transform:scale(1)}
+    button:hover{transform:scale(1.05);box-shadow:0 6px 16px rgba(0,0,0,0.4)}
+    button:active{transform:scale(0.98)}
+    
+    /* Active state indicator */
+    button.active::before{content:'✓';position:absolute;top:2px;right:6px;font-size:12px;font-weight:bold;animation:pulse 0.3s ease}
+    
+    @keyframes pulse{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+    
+    .auto{background:linear-gradient(90deg,#16a34a,#4ade80);box-shadow:0 4px 12px rgba(34,161,68,0.3)}
+    .auto.active{box-shadow:0 0 20px rgba(74,222,128,0.8);filter:brightness(1.1)}
+    .manual{background:linear-gradient(90deg,#dc2626,#fb7185);box-shadow:0 4px 12px rgba(220,38,38,0.3)}
+    .manual.active{box-shadow:0 0 20px rgba(248,113,113,0.8);filter:brightness(1.1)}
+    .on{background:linear-gradient(90deg,#0ea5a4,#60a5fa);box-shadow:0 4px 12px rgba(14,165,164,0.3)}
+    .on.active{box-shadow:0 0 20px rgba(96,165,250,0.8);filter:brightness(1.1)}
+    .off{background:linear-gradient(90deg,#475569,#64748b);box-shadow:0 4px 12px rgba(71,85,105,0.3);opacity:0.7}
+    .off.active{opacity:1;box-shadow:0 0 20px rgba(100,116,139,0.6);filter:brightness(1.1)}
+    .feed{background:linear-gradient(90deg,#f59e0b,#fb923c);box-shadow:0 4px 12px rgba(245,158,11,0.3)}
+    .feed.active{box-shadow:0 0 20px rgba(251,146,60,0.8);filter:brightness(1.1);animation:feedPulse 0.5s ease}
+    
+    @keyframes feedPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 
     .history-section{display:grid;gap:14px}
     .chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:12px}
-    .chart-card{background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:12px}
+    .chart-card{background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:12px;transition:all 0.3s ease}
+    .chart-card:hover{border-color:rgba(255,255,255,0.12);background:rgba(15,23,42,0.95)}
     .chart-card h3{margin:0 0 8px 0;font-size:13px;color:#dffaff}
     .chart-card .chart-box{position:relative;height:220px}
 
     table{
     margin-top:20px;
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    overflow-x:auto;
 }
 
 th,td{
-
     border:1px solid rgba(255,255,255,.1);
-
-    padding:8px;
-
+    padding:10px 8px;
     text-align:center;
-
-    font-size:13px;
-
+    font-size:12px;
 }
 
 th{
-
     background:#172554;
+    font-weight:600;
+}
 
+tbody tr{
+    transition:background 0.2s ease;
+}
+
+tbody tr:hover{
+    background:#1a2332;
 }
 
 tbody tr:nth-child(even){
-
     background:#111827;
-
 }
+
     footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
 
-    @media (max-width:520px){
-      .logo{width:48px;height:48px}
-      .value{font-size:22px}
-      header{gap:10px}
-      .chart-grid{grid-template-columns:1fr}
+    @media (max-width:768px){
+      .wrap{padding:12px}
+      .logo{width:48px;height:48px;font-size:24px}
+      h1{font-size:16px}
+      p.lead{font-size:12px}
+      .grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+      .card{padding:14px}
+      .value{font-size:24px}
+      button{padding:9px 12px;min-width:80px;font-size:12px}
+      .chart-grid{grid-template-columns:1fr;gap:12px}
       .chart-card .chart-box{height:180px}
+    }
+
+    @media (max-width:520px){
+      .wrap{padding:10px}
+      .logo{width:44px;height:44px;font-size:22px}
+      h1{font-size:14px}
+      p.lead{font-size:11px}
+      .grid{grid-template-columns:1fr;gap:10px}
+      .card{padding:12px}
+      header{gap:8px;margin-bottom:12px}
+      .value{font-size:20px}
+      .meta{font-size:11px}
+      .controls{gap:6px}
+      button{padding:8px 10px;min-width:70px;font-size:11px}
+      .chart-grid{gap:10px}
+      .chart-card{padding:10px}
+      .chart-card .chart-box{height:160px}
+      table{font-size:11px}
+      th,td{padding:6px 4px;font-size:10px}
+    }
+
+    @media (max-width:360px){
+      .wrap{padding:8px}
+      .logo{width:40px;height:40px;font-size:18px}
+      h1{font-size:13px}
+      .value{font-size:18px}
+      button{padding:7px 8px;min-width:60px;font-size:10px}
+      .chart-card .chart-box{height:140px}
     }
   </style>
 </head>
@@ -420,23 +475,96 @@ onValue(ref(db, "sensor/stok_pakan"), (snapshot) => {
   document.getElementById("pakan").innerHTML = snapshot.val() + " %";
 });
 
+// Listen untuk update button states dari Firebase
+onValue(ref(db, "control/auto_mode"), (snapshot) => {
+  const mode = snapshot.val();
+  if (mode !== null) {
+    updateModeButtons(mode);
+  }
+});
+
+onValue(ref(db, "relay/kuras"), (snapshot) => {
+  const mode = snapshot.val();
+  if (mode !== null) {
+    updateKurasButtons(mode);
+  }
+});
+
+onValue(ref(db, "relay/isi"), (snapshot) => {
+  const mode = snapshot.val();
+  if (mode !== null) {
+    updateIsiButtons(mode);
+  }
+});
+
 window.setMode = function(mode) {
   set(ref(db, "control/auto_mode"), mode);
+  updateModeButtons(mode);
 }
 
 window.setKuras = function(mode) {
   set(ref(db, "relay/kuras"), mode);
+  updateKurasButtons(mode);
 }
 
 window.setIsi = function(mode) {
   set(ref(db, "relay/isi"), mode);
+  updateIsiButtons(mode);
 }
 
 window.feedFish = function() {
+  const btn = event.target;
+  btn.classList.add("active");
   set(ref(db, "servo/feed"), 1);
   setTimeout(() => {
     set(ref(db, "servo/feed"), 0);
+    btn.classList.remove("active");
   }, 1000);
+}
+
+// Fungsi untuk update visual button Mode
+function updateModeButtons(mode) {
+  const autoBtn = document.querySelector(".card .controls button.auto");
+  const manualBtn = document.querySelector(".card .controls button.manual");
+  if (mode === 1) {
+    autoBtn.classList.add("active");
+    manualBtn.classList.remove("active");
+  } else {
+    autoBtn.classList.remove("active");
+    manualBtn.classList.add("active");
+  }
+}
+
+// Fungsi untuk update visual button Kuras
+function updateKurasButtons(mode) {
+  const buttons = Array.from(document.querySelectorAll(".card")).find(card => 
+    card.querySelector("h2")?.innerText.includes("Pompa Kuras")
+  )?.querySelectorAll("button") || [];
+  const onBtn = buttons[0];
+  const offBtn = buttons[1];
+  if (mode === 1) {
+    onBtn.classList.add("active");
+    offBtn.classList.remove("active");
+  } else {
+    onBtn.classList.remove("active");
+    offBtn.classList.add("active");
+  }
+}
+
+// Fungsi untuk update visual button Isi
+function updateIsiButtons(mode) {
+  const buttons = Array.from(document.querySelectorAll(".card")).find(card => 
+    card.querySelector("h2")?.innerText.includes("Pompa Isi")
+  )?.querySelectorAll("button") || [];
+  const onBtn = buttons[0];
+  const offBtn = buttons[1];
+  if (mode === 1) {
+    onBtn.classList.add("active");
+    offBtn.classList.remove("active");
+  } else {
+    onBtn.classList.remove("active");
+    offBtn.classList.add("active");
+  }
 }
 
 //==============================
